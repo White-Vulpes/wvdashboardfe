@@ -2,27 +2,56 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
 import { DashboardContent } from 'src/layouts/dashboard';
+import _ from 'lodash';
 
-import { AnalyticsTasks } from '../analytics-tasks';
-import { AnalyticsCurrentVisits } from '../analytics-current-visits';
-import { AnalyticsWebsiteVisits } from '../analytics-website-visits';
-import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
-import { AnalyticsTrafficBySite } from '../analytics-traffic-by-site';
-import { AnalyticsCurrentSubject } from '../analytics-current-subject';
-import { AnalyticsConversionRates } from '../analytics-conversion-rates';
+import { AnalyticsComponent } from '../analytics';
+import { AnalyticsLineChart } from '../analytics-line-chart';
 
-// ----------------------------------------------------------------------
+export function DynamicView({ nav }: any) {
+  function getComponents(components: any) {
+    return _.map(components, (component, index) => {
+      if (component.grid !== undefined) {
+        return (
+          <Grid
+            key={index}
+            container={component.grid.container}
+            spacing={component.grid.spacing ? component.grid.spacing : 0}
+            xs={component.grid.xs ? component.grid.xs : false}
+            sm={component.grid.sm ? component.grid.sm : false}
+            md={component.grid.md ? component.grid.md : false}
+            lg={component.grid.lg ? component.grid.lg : false}
+          >
+            {getComponents(component.components)}
+          </Grid>
+        );
+      }
+      if (component.id) {
+        return (
+          <AnalyticsLineChart
+            title="New users"
+            percent={-0.1}
+            total={1352831}
+            color="secondary"
+            chart={{
+              categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+              series: [56, 47, 40, 62, 73, 30, 23, 54],
+            }}
+          />
+        );
+      }
+      return <></>;
+    });
+  }
 
-export function OverviewAnalyticsView() {
   return (
     <DashboardContent maxWidth="xl">
       <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
-        Hi, Welcome back 👋
+        {nav.heading}
       </Typography>
-
-      <Grid container spacing={3}>
+      {getComponents(nav.components)}
+      {/* <Grid container spacing={3}>
         <Grid xs={12} sm={6} md={3}>
-          <AnalyticsWidgetSummary
+          <AnalyticsLineChart
             title="Weekly sales"
             percent={2.6}
             total={714000}
@@ -34,7 +63,7 @@ export function OverviewAnalyticsView() {
         </Grid>
 
         <Grid xs={12} sm={6} md={3}>
-          <AnalyticsWidgetSummary
+          <AnalyticsLineChart
             title="New users"
             percent={-0.1}
             total={1352831}
@@ -47,7 +76,7 @@ export function OverviewAnalyticsView() {
         </Grid>
 
         <Grid xs={12} sm={6} md={3}>
-          <AnalyticsWidgetSummary
+          <AnalyticsLineChart
             title="Purchase orders"
             percent={2.8}
             total={1723315}
@@ -60,7 +89,7 @@ export function OverviewAnalyticsView() {
         </Grid>
 
         <Grid xs={12} sm={6} md={3}>
-          <AnalyticsWidgetSummary
+          <AnalyticsLineChart
             title="Messages"
             percent={3.6}
             total={234}
@@ -73,7 +102,7 @@ export function OverviewAnalyticsView() {
         </Grid>
 
         <Grid xs={12} md={6} lg={4}>
-          <AnalyticsCurrentVisits
+          <AnalyticsPieChart
             title="Current visits"
             chart={{
               series: [
@@ -87,7 +116,7 @@ export function OverviewAnalyticsView() {
         </Grid>
 
         <Grid xs={12} md={6} lg={8}>
-          <AnalyticsWebsiteVisits
+          <AnalyticsVeritcalBar
             title="Website visits"
             subheader="(+43%) than last year"
             chart={{
@@ -101,7 +130,7 @@ export function OverviewAnalyticsView() {
         </Grid>
 
         <Grid xs={12} md={6} lg={8}>
-          <AnalyticsConversionRates
+          <AnalyticsHorizontalBar
             title="Conversion rates"
             subheader="(+43%) than last year"
             chart={{
@@ -115,7 +144,7 @@ export function OverviewAnalyticsView() {
         </Grid>
 
         <Grid xs={12} md={6} lg={4}>
-          <AnalyticsCurrentSubject
+          <AnalyticsRadar
             title="Current subject"
             chart={{
               categories: ['English', 'History', 'Physics', 'Geography', 'Chinese', 'Math'],
@@ -129,7 +158,7 @@ export function OverviewAnalyticsView() {
         </Grid>
 
         <Grid xs={12} md={6} lg={4}>
-          <AnalyticsTrafficBySite
+          <AnalyticsBox
             title="Traffic by site"
             list={[
               { value: 'facebook', label: 'Facebook', total: 323234 },
@@ -148,7 +177,7 @@ export function OverviewAnalyticsView() {
             }))}
           />
         </Grid>
-      </Grid>
+      </Grid> */}
     </DashboardContent>
   );
 }

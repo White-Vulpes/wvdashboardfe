@@ -32,30 +32,22 @@ export const Logo = forwardRef<HTMLDivElement, LogoProps>(
     const PRIMARY_DARKER = theme.vars.palette.primary.dark;
 
     /*
-    * OR using local (public folder)
-    *
+     * OR using local (public folder)
+     */
     const singleLogo = (
       <Box
         alt="Single logo"
         component="img"
-        src={`/logo/logo-single.svg`}
+        src="assets/logo/logo.svg"
         width="100%"
         height="100%"
       />
     );
 
     const fullLogo = (
-      <Box
-        alt="Full logo"
-        component="img"
-        src={`/logo/logo-full.svg`}
-        width="100%"
-        height="100%"
-      />
+      <Box alt="Full logo" component="img" src="assets/logo/logo.svg" width="100%" height="100%" />
     );
-    *
-    */
-
+    /*  
     const singleLogo = (
       <svg
         width="100%"
@@ -184,7 +176,7 @@ export const Logo = forwardRef<HTMLDivElement, LogoProps>(
           </linearGradient>
         </defs>
       </svg>
-    );
+    );  */
 
     const baseSize = {
       width: width ?? 40,

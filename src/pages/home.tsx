@@ -3,10 +3,12 @@ import { Helmet } from 'react-helmet-async';
 import { CONFIG } from 'src/config-global';
 
 import { OverviewAnalyticsView } from 'src/sections/overview/view';
+import { useEffect, useState } from 'react';
+import { DynamicView } from 'src/sections/dynamic/view';
 
 // ----------------------------------------------------------------------
 
-export default function Page() {
+export default function Page({ nav }: any) {
   return (
     <>
       <Helmet>
@@ -18,7 +20,7 @@ export default function Page() {
         <meta name="keywords" content="react,material,kit,application,dashboard,admin,template" />
       </Helmet>
 
-      <OverviewAnalyticsView />
+      <DynamicView nav={JSON.parse(nav.components)} />
     </>
   );
 }

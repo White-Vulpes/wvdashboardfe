@@ -28,7 +28,7 @@ type Props = CardProps & {
   };
 };
 
-export function AnalyticsWidgetSummary({
+export function AnalyticsLineChart({
   title,
   total,
   chart,

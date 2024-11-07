@@ -22,16 +22,13 @@ import { fToNow } from 'src/utils/format-time';
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 
-// ----------------------------------------------------------------------
-
-type NotificationItemProps = {
-  id: string;
-  type: string;
-  title: string;
-  isUnRead: boolean;
-  description: string;
-  avatarUrl: string | null;
-  postedAt: string | number | null;
+export type NotificationItemProps = {
+  id?: string;
+  unread?: Boolean;
+  heading?: string;
+  sub_heading?: string;
+  logo?: string;
+  created_at?: string;
 };
 
 export type NotificationsPopoverProps = IconButtonProps & {
@@ -41,7 +38,7 @@ export type NotificationsPopoverProps = IconButtonProps & {
 export function NotificationsPopover({ data = [], sx, ...other }: NotificationsPopoverProps) {
   const [notifications, setNotifications] = useState(data);
 
-  const totalUnRead = notifications.filter((item) => item.isUnRead === true).length;
+  const totalUnRead = notifications.filter((item) => item.unread === true).length;
 
   const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
 
@@ -56,7 +53,7 @@ export function NotificationsPopover({ data = [], sx, ...other }: NotificationsP
   const handleMarkAllAsRead = useCallback(() => {
     const updatedNotifications = notifications.map((notification) => ({
       ...notification,
-      isUnRead: false,
+      unread: false,
     }));
 
     setNotifications(updatedNotifications);
@@ -162,7 +159,7 @@ function NotificationItem({ notification }: { notification: NotificationItemProp
         py: 1.5,
         px: 2.5,
         mt: '1px',
-        ...(notification.isUnRead && {
+        ...(notification.unread && {
           bgcolor: 'action.selected',
         }),
       }}
@@ -184,7 +181,7 @@ function NotificationItem({ notification }: { notification: NotificationItemProp
             }}
           >
             <Iconify width={14} icon="solar:clock-circle-outline" />
-            {fToNow(notification.postedAt)}
+            {fToNow(notification.created_at)}
           </Typography>
         }
       />
@@ -194,58 +191,17 @@ function NotificationItem({ notification }: { notification: NotificationItemProp
 
 // ----------------------------------------------------------------------
 
-function renderContent(notification: NotificationItemProps) {
+function renderContent({ heading, sub_heading, logo }: NotificationItemProps) {
   const title = (
     <Typography variant="subtitle2">
-      {notification.title}
+      {heading}
       <Typography component="span" variant="body2" sx={{ color: 'text.secondary' }}>
-        &nbsp; {notification.description}
+        &nbsp; {sub_heading}
       </Typography>
     </Typography>
   );
-
-  if (notification.type === 'order-placed') {
-    return {
-      avatarUrl: (
-        <img
-          alt={notification.title}
-          src="/assets/icons/notification/ic-notification-package.svg"
-        />
-      ),
-      title,
-    };
-  }
-  if (notification.type === 'order-shipped') {
-    return {
-      avatarUrl: (
-        <img
-          alt={notification.title}
-          src="/assets/icons/notification/ic-notification-shipping.svg"
-        />
-      ),
-      title,
-    };
-  }
-  if (notification.type === 'mail') {
-    return {
-      avatarUrl: (
-        <img alt={notification.title} src="/assets/icons/notification/ic-notification-mail.svg" />
-      ),
-      title,
-    };
-  }
-  if (notification.type === 'chat-message') {
-    return {
-      avatarUrl: (
-        <img alt={notification.title} src="/assets/icons/notification/ic-notification-chat.svg" />
-      ),
-      title,
-    };
-  }
   return {
-    avatarUrl: notification.avatarUrl ? (
-      <img alt={notification.title} src={notification.avatarUrl} />
-    ) : null,
+    avatarUrl: <img alt={heading} src={`/assets/icons/notification/${logo}.svg`} />,
     title,
   };
 }

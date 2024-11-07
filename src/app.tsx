@@ -1,44 +1,52 @@
 import 'src/global.css';
-
-import Fab from '@mui/material/Fab';
-
-import { Router } from 'src/routes/sections';
-
+import { Router, SignUpPage } from 'src/routes/sections';
 import { useScrollToTop } from 'src/hooks/use-scroll-to-top';
-
 import { ThemeProvider } from 'src/theme/theme-provider';
+import { CookiesProvider } from 'react-cookie';
+import { SnackbarProvider } from 'notistack';
+import { Navigate, useRoutes } from 'react-router-dom';
+import SignInPage from 'src/pages/sign-in';
+import { AuthLayout } from './layouts/auth';
+import { useAuth } from './routes/hooks';
+import ImageUploadItem from './sections/images/image-upload-item';
 
-import { Iconify } from 'src/components/iconify';
-
-// ----------------------------------------------------------------------
+function AuthRoute() {
+  return useRoutes([
+    {
+      path: '*',
+      element: <Navigate to="/sign-in" replace />,
+    },
+    {
+      path: '/sign-in',
+      element: (
+        <AuthLayout>
+          <SignInPage />
+        </AuthLayout>
+      ),
+    },
+    {
+      path: '/sign-up',
+      element: (
+        <AuthLayout>
+          <SignUpPage />
+        </AuthLayout>
+      ),
+    },
+  ]);
+}
 
 export default function App() {
   useScrollToTop();
-
-  const githubButton = (
-    <Fab
-      size="medium"
-      aria-label="Github"
-      href="https://github.com/minimal-ui-kit/material-kit-react"
-      sx={{
-        zIndex: 9,
-        right: 20,
-        bottom: 20,
-        width: 44,
-        height: 44,
-        position: 'fixed',
-        bgcolor: 'grey.800',
-        color: 'common.white',
-      }}
-    >
-      <Iconify width={24} icon="eva:github-fill" />
-    </Fab>
-  );
-
+  const [isAuthenticated, token] = useAuth();
   return (
-    <ThemeProvider>
-      <Router />
-      {githubButton}
-    </ThemeProvider>
+    <CookiesProvider>
+      <SnackbarProvider
+        Components={{
+          uploadItems: ImageUploadItem,
+        }}
+      >
+        <ThemeProvider>{isAuthenticated ? <Router /> : <AuthRoute />}</ThemeProvider>
+      </SnackbarProvider>
+    </CookiesProvider>
   );
 }

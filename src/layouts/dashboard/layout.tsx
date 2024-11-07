@@ -6,21 +6,16 @@ import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
 import { useTheme } from '@mui/material/styles';
 
-import { _langs, _notifications } from 'src/_mock';
-
 import { Iconify } from 'src/components/iconify';
-
 import { Main } from './main';
 import { layoutClasses } from '../classes';
 import { NavMobile, NavDesktop } from './nav';
-import { navData } from '../config-nav-dashboard';
+import { getNavData } from '../config-nav-dashboard';
 import { Searchbar } from '../components/searchbar';
-import { _workspaces } from '../config-nav-workspace';
 import { MenuButton } from '../components/menu-button';
 import { LayoutSection } from '../core/layout-section';
 import { HeaderSection } from '../core/header-section';
 import { AccountPopover } from '../components/account-popover';
-import { LanguagePopover } from '../components/language-popover';
 import { NotificationsPopover } from '../components/notifications-popover';
 
 // ----------------------------------------------------------------------
@@ -31,13 +26,13 @@ export type DashboardLayoutProps = {
   header?: {
     sx?: SxProps<Theme>;
   };
+  data: any;
 };
 
-export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) {
+export function DashboardLayout({ sx, children, header, data }: DashboardLayoutProps) {
   const theme = useTheme();
 
   const [navOpen, setNavOpen] = useState(false);
-
   const layoutQuery: Breakpoint = 'lg';
 
   return (
@@ -71,18 +66,22 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   }}
                 />
                 <NavMobile
-                  data={navData}
+                  data={getNavData(data.dashboards)}
                   open={navOpen}
                   onClose={() => setNavOpen(false)}
-                  workspaces={_workspaces}
+                  workspaces={{
+                    id: `${import.meta.env.VITE_API_URL}`,
+                    name: data.url,
+                    logo: '/assets/icons/workspaces/logo-1.webp',
+                    plan: data.plan_type,
+                  }}
                 />
               </>
             ),
             rightArea: (
               <Box gap={1} display="flex" alignItems="center">
                 <Searchbar />
-                <LanguagePopover data={_langs} />
-                <NotificationsPopover data={_notifications} />
+                <NotificationsPopover data={data.notifications} />
                 <AccountPopover
                   data={[
                     {
@@ -111,7 +110,16 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
        * Sidebar
        *************************************** */
       sidebarSection={
-        <NavDesktop data={navData} layoutQuery={layoutQuery} workspaces={_workspaces} />
+        <NavDesktop
+          data={getNavData(data.dashboards)}
+          layoutQuery={layoutQuery}
+          workspaces={{
+            id: `${import.meta.env.VITE_WEBSITE_ID}`,
+            name: data.url,
+            logo: '/assets/icons/workspaces/logo-1.webp',
+            plan: data.plan_type,
+          }}
+        />
       }
       /** **************************************
        * Footer
