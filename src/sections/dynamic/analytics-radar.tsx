@@ -7,26 +7,36 @@ import { useTheme } from '@mui/material/styles';
 import CardHeader from '@mui/material/CardHeader';
 
 import { Chart, useChart, ChartLegends } from 'src/components/chart';
+import { useState } from 'react';
 
 // ----------------------------------------------------------------------
 
 type Props = CardProps & {
   title?: string;
   subheader?: string;
-  chart: {
-    colors?: string[];
-    categories: string[];
-    series: {
-      name: string;
-      data: number[];
-    }[];
-    options?: ChartOptions;
-  };
 };
 
-export function AnalyticsRadar({ title, subheader, chart, ...other }: Props) {
-  const theme = useTheme();
+type AnalyticsRadarProps = {
+  colors?: string[];
+  categories: string[];
+  series: {
+    name: string;
+    data: number[];
+  }[];
+  options?: ChartOptions;
+};
 
+export function AnalyticsRadar({ title, subheader, ...other }: Props) {
+  const theme = useTheme();
+  const [chart, setChart] = useState<AnalyticsRadarProps>({
+    categories: [],
+    series: [
+      {
+        name: '',
+        data: [],
+      },
+    ],
+  });
   const chartColors = chart.colors ?? [
     theme.palette.primary.main,
     theme.palette.warning.main,

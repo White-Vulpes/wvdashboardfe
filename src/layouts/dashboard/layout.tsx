@@ -1,11 +1,8 @@
 import type { Theme, SxProps, Breakpoint } from '@mui/material/styles';
-
 import { useState } from 'react';
-
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
 import { useTheme } from '@mui/material/styles';
-
 import { Iconify } from 'src/components/iconify';
 import { Main } from './main';
 import { layoutClasses } from '../classes';
@@ -18,15 +15,18 @@ import { HeaderSection } from '../core/header-section';
 import { AccountPopover } from '../components/account-popover';
 import { NotificationsPopover } from '../components/notifications-popover';
 
-// ----------------------------------------------------------------------
-
 export type DashboardLayoutProps = {
   sx?: SxProps<Theme>;
   children: React.ReactNode;
   header?: {
     sx?: SxProps<Theme>;
   };
-  data: any;
+  data: {
+    dashboards: any;
+    plan_type: 'Pro' | 'Free';
+    url: string;
+    notifications: any;
+  };
 };
 
 export function DashboardLayout({ sx, children, header, data }: DashboardLayoutProps) {
@@ -34,12 +34,10 @@ export function DashboardLayout({ sx, children, header, data }: DashboardLayoutP
 
   const [navOpen, setNavOpen] = useState(false);
   const layoutQuery: Breakpoint = 'lg';
+  const nav_data = getNavData(data.dashboards);
 
   return (
     <LayoutSection
-      /** **************************************
-       * Header
-       *************************************** */
       headerSection={
         <HeaderSection
           layoutQuery={layoutQuery}
@@ -66,7 +64,7 @@ export function DashboardLayout({ sx, children, header, data }: DashboardLayoutP
                   }}
                 />
                 <NavMobile
-                  data={getNavData(data.dashboards)}
+                  data={nav_data}
                   open={navOpen}
                   onClose={() => setNavOpen(false)}
                   workspaces={{
@@ -106,12 +104,9 @@ export function DashboardLayout({ sx, children, header, data }: DashboardLayoutP
           }}
         />
       }
-      /** **************************************
-       * Sidebar
-       *************************************** */
       sidebarSection={
         <NavDesktop
-          data={getNavData(data.dashboards)}
+          data={nav_data}
           layoutQuery={layoutQuery}
           workspaces={{
             id: `${import.meta.env.VITE_WEBSITE_ID}`,
@@ -121,13 +116,7 @@ export function DashboardLayout({ sx, children, header, data }: DashboardLayoutP
           }}
         />
       }
-      /** **************************************
-       * Footer
-       *************************************** */
       footerSection={null}
-      /** **************************************
-       * Style
-       *************************************** */
       cssVars={{
         '--layout-nav-vertical-width': '300px',
         '--layout-dashboard-content-pt': theme.spacing(1),

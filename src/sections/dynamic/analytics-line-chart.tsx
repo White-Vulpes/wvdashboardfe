@@ -13,37 +13,44 @@ import { varAlpha, bgGradient } from 'src/theme/styles';
 import { Iconify } from 'src/components/iconify';
 import { SvgColor } from 'src/components/svg-color';
 import { Chart, useChart } from 'src/components/chart';
+import { useEffect, useState } from 'react';
+import { useAuth } from 'src/routes/hooks';
 
 // ----------------------------------------------------------------------
 
 type Props = CardProps & {
   title: string;
-  total: number;
-  percent: number;
   color?: ColorType;
-  chart: {
-    series: number[];
-    categories: string[];
-    options?: ChartOptions;
-  };
 };
 
-export function AnalyticsLineChart({
-  title,
-  total,
-  chart,
-  percent,
-  color = 'primary',
-  sx,
-  ...other
-}: Props) {
-  const theme = useTheme();
+type LineChartProps = {
+  total: number;
+  percent: number;
+  series: number[];
+  categories: string[];
+  options?: ChartOptions;
+  colors?: string[];
+};
 
+export function AnalyticsLineChart({ title, color = 'primary', sx, ...other }: Props) {
+  const theme = useTheme();
   const chartColors = [theme.palette[color].dark];
+  const [isAuthenticated, token] = useAuth();
+  const [chart, setChart] = useState<LineChartProps>({
+    series: [],
+    categories: [],
+    total: 0,
+    percent: 0,
+  });
+
+  useEffect(() => {
+    // if (!(chart.categories.length > 0)) {
+    // }
+  }, [token, chart]);
 
   const chartOptions = useChart({
     chart: { sparkline: { enabled: true } },
-    colors: chartColors,
+    colors: chart?.colors ?? chartColors,
     xaxis: { categories: chart.categories },
     grid: {
       padding: {
@@ -70,10 +77,13 @@ export function AnalyticsLineChart({
         alignItems: 'center',
       }}
     >
-      <Iconify width={20} icon={percent < 0 ? 'eva:trending-down-fill' : 'eva:trending-up-fill'} />
+      <Iconify
+        width={20}
+        icon={chart.percent < 0 ? 'eva:trending-down-fill' : 'eva:trending-up-fill'}
+      />
       <Box component="span" sx={{ typography: 'subtitle2' }}>
-        {percent > 0 && '+'}
-        {fPercent(percent)}
+        {chart.percent > 0 && '+'}
+        {fPercent(chart.percent)}
       </Box>
     </Box>
   );
@@ -104,7 +114,7 @@ export function AnalyticsLineChart({
       >
         <Box sx={{ flexGrow: 1, minWidth: 112 }}>
           <Box sx={{ typography: 'subtitle2' }}>{title}</Box>
-          <Box sx={{ typography: 'h4' }}>{fShortenNumber(total)}</Box>
+          <Box sx={{ typography: 'h4' }}>{fShortenNumber(chart.total)}</Box>
         </Box>
       </Box>
       {renderTrending}

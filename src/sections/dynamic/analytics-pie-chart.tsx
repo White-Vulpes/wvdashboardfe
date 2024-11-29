@@ -9,24 +9,36 @@ import CardHeader from '@mui/material/CardHeader';
 import { fNumber } from 'src/utils/format-number';
 
 import { Chart, useChart, ChartLegends } from 'src/components/chart';
+import { useEffect, useState } from 'react';
 
 // ----------------------------------------------------------------------
 
 type Props = CardProps & {
   title?: string;
   subheader?: string;
-  chart: {
-    colors?: string[];
-    series: {
-      label: string;
-      value: number;
-    }[];
-    options?: ChartOptions;
-  };
 };
 
-export function AnalyticsPieChart({ title, subheader, chart, ...other }: Props) {
+type AnalyticsPieChartProps = {
+  colors?: string[];
+  series: {
+    label: string;
+    value: number;
+  }[];
+  options?: ChartOptions;
+};
+
+export function AnalyticsPieChart({ title, subheader, ...other }: Props) {
   const theme = useTheme();
+  const [chart, setChart] = useState<AnalyticsPieChartProps>({
+    series: [
+      { label: 'America', value: 0 },
+      { label: 'Asia', value: 0 },
+      { label: 'Europe', value: 0 },
+      { label: 'Africa', value: 0 },
+    ],
+  });
+
+  useEffect(() => {}, []);
 
   const chartSeries = chart.series.map((item) => item.value);
 

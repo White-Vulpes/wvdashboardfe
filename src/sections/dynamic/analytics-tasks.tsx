@@ -23,15 +23,21 @@ import { Scrollbar } from 'src/components/scrollbar';
 type Props = CardProps & {
   title?: string;
   subheader?: string;
-  list: {
-    id: string;
-    name: string;
-  }[];
 };
 
-export function AnalyticsTasks({ title, subheader, list, ...other }: Props) {
-  const [selected, setSelected] = useState(['2']);
+type AnalyticsTasksProps = {
+  id: string;
+  name: string;
+}[];
 
+export function AnalyticsTasks({ title, subheader, ...other }: Props) {
+  const [selected, setSelected] = useState(['2']);
+  const [list, setList] = useState<AnalyticsTasksProps>([
+    {
+      id: 'hello',
+      name: 'Hello World',
+    },
+  ]);
   const handleClickComplete = (taskId: string) => {
     const tasksCompleted = selected.includes(taskId)
       ? selected.filter((value) => value !== taskId)
@@ -64,7 +70,7 @@ export function AnalyticsTasks({ title, subheader, list, ...other }: Props) {
 
 type ItemProps = BoxProps & {
   checked: boolean;
-  item: Props['list'][number];
+  item: AnalyticsTasksProps[number];
   onChange: (id: string) => void;
 };
 

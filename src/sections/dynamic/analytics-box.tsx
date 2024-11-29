@@ -10,16 +10,24 @@ import { fShortenNumber } from 'src/utils/format-number';
 import { varAlpha } from 'src/theme/styles';
 
 import { Iconify } from 'src/components/iconify';
+import { useState } from 'react';
 
 // ----------------------------------------------------------------------
 
 type Props = CardProps & {
   title?: string;
   subheader?: string;
-  list: { value: string; label: string; total: number }[];
 };
 
-export function AnalyticsBox({ title, subheader, list, sx, ...other }: Props) {
+type AnalyticsBoxProps = { value: string; label: string; total: number }[];
+
+export function AnalyticsBox({ title, subheader, sx, ...other }: Props) {
+  const [list, setList] = useState<AnalyticsBoxProps>([
+    { value: 'facebook', label: 'Facebook', total: 0 },
+    { value: 'instagram', label: 'Instagram', total: 0 },
+    { value: 'twitter', label: 'X', total: 0 },
+    { value: 'google', label: 'Google', total: 0 },
+  ]);
   return (
     <Card sx={sx} {...other}>
       <CardHeader title={title} subheader={subheader} />
@@ -46,6 +54,7 @@ export function AnalyticsBox({ title, subheader, list, sx, ...other }: Props) {
               <Iconify icon="eva:linkedin-fill" color="#0A66C2" width={32} />
             )}
             {site.value === 'twitter' && <Iconify icon="ri:twitter-x-fill" width={32} />}
+            {site.value === 'instagram' && <Iconify icon="skill-icons:instagram" width={32} />}
 
             <Typography variant="h6" sx={{ mt: 1 }}>
               {fShortenNumber(site.total)}

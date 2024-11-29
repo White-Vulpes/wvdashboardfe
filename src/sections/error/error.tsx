@@ -18,7 +18,7 @@ export function Error() {
         </Typography>
 
         <Typography sx={{ color: 'text.secondary' }}>
-          Uh-oh! Our server&apos;s off getting a quick tune-up! 🛠️ Please check back later when
+          Uh-oh! Our server&apos;s off getting a quick tune-up! Please check back later when
           it&apos;s back in action. Thanks for hanging in there!
         </Typography>
 
@@ -31,10 +31,6 @@ export function Error() {
             my: { xs: 5, sm: 5 },
           }}
         />
-
-        <Button component={RouterLink} href="/" size="large" variant="contained" color="inherit">
-          Go to home
-        </Button>
       </Container>
     </SimpleLayout>
   );

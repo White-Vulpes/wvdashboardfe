@@ -8,27 +8,31 @@ import { useTheme, alpha as hexAlpha } from '@mui/material/styles';
 import { fNumber } from 'src/utils/format-number';
 
 import { Chart, useChart } from 'src/components/chart';
+import { useEffect, useState } from 'react';
+import { useAuth } from 'src/routes/hooks';
 
 // ----------------------------------------------------------------------
 
 type Props = CardProps & {
   title?: string;
   subheader?: string;
-  chart: {
-    colors?: string[];
-    categories?: string[];
-    series: {
-      name: string;
-      data: number[];
-    }[];
-    options?: ChartOptions;
-  };
 };
 
-export function AnalyticsHorizontalBar({ title, subheader, chart, ...other }: Props) {
-  const theme = useTheme();
+type AnalyticsHorizontalBarProps = {
+  colors?: string[];
+  categories?: string[];
+  series: {
+    name: string;
+    data: number[];
+  }[];
+  options?: ChartOptions;
+};
 
-  const chartColors = chart.colors ?? [
+export function AnalyticsHorizontalBar({ title, subheader, ...other }: Props) {
+  const theme = useTheme();
+  const [isAuthenticated, token] = useAuth();
+  const [chart, setChart] = useState<AnalyticsHorizontalBarProps>({ categories: [], series: [] });
+  const chartColors = chart?.colors ?? [
     theme.palette.primary.dark,
     hexAlpha(theme.palette.primary.dark, 0.24),
   ];
@@ -58,13 +62,17 @@ export function AnalyticsHorizontalBar({ title, subheader, chart, ...other }: Pr
         dataLabels: { position: 'top' },
       },
     },
-    ...chart.options,
+    ...chart?.options,
   });
+
+  useEffect(() => {
+    // if (!(chart.categories.length > 0)) {
+    // }
+  }, [chart, token]);
 
   return (
     <Card {...other}>
       <CardHeader title={title} subheader={subheader} />
-
       <Chart
         type="bar"
         series={chart.series}

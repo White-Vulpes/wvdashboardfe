@@ -1,31 +1,31 @@
 import type { CardProps } from '@mui/material/Card';
 import type { ChartOptions } from 'src/components/chart';
-
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import { useTheme, alpha as hexAlpha } from '@mui/material/styles';
-
 import { Chart, useChart } from 'src/components/chart';
-
-// ----------------------------------------------------------------------
+import { useState } from 'react';
 
 type Props = CardProps & {
   title?: string;
   subheader?: string;
-  chart: {
-    colors?: string[];
-    categories?: string[];
-    series: {
-      name: string;
-      data: number[];
-    }[];
-    options?: ChartOptions;
-  };
 };
 
-export function AnalyticsVeritcalBar({ title, subheader, chart, ...other }: Props) {
-  const theme = useTheme();
+type AnalyticsVerticalBarProps = {
+  colors?: string[];
+  categories?: string[];
+  series: {
+    name: string;
+    data: number[];
+  }[];
+  options?: ChartOptions;
+};
 
+export function AnalyticsVerticalBar({ title, subheader, ...other }: Props) {
+  const theme = useTheme();
+  const [chart, setChart] = useState<AnalyticsVerticalBarProps>({
+    series: [{ name: '', data: [] }],
+  });
   const chartColors = chart.colors ?? [
     theme.palette.primary.dark,
     hexAlpha(theme.palette.primary.light, 0.64),
@@ -54,7 +54,6 @@ export function AnalyticsVeritcalBar({ title, subheader, chart, ...other }: Prop
   return (
     <Card {...other}>
       <CardHeader title={title} subheader={subheader} />
-
       <Chart
         type="bar"
         series={chart.series}
