@@ -34,7 +34,7 @@
     "@mui/lab": "^5.0.0-alpha.173",
     "@mui/material": "^5.16.7",
     "@types/lodash": "^4.17.10",
-    "@whitevulpes/border-progress-bar": "^1.1.0",
+    "@whitevulpes/border-progress-bar": "^1.2.2",
     "apexcharts": "^3.52.0",
     "bcryptjs-react": "^2.4.6",
     "clsx": "^2.1.1",

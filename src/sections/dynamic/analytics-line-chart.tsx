@@ -15,12 +15,14 @@ import { SvgColor } from 'src/components/svg-color';
 import { Chart, useChart } from 'src/components/chart';
 import { useEffect, useState } from 'react';
 import { useAuth } from 'src/routes/hooks';
+import _ from 'lodash';
 
 // ----------------------------------------------------------------------
 
 type Props = CardProps & {
   title: string;
   color?: ColorType;
+  query?: string;
 };
 
 type LineChartProps = {
@@ -32,7 +34,7 @@ type LineChartProps = {
   colors?: string[];
 };
 
-export function AnalyticsLineChart({ title, color = 'primary', sx, ...other }: Props) {
+export function AnalyticsLineChart({ title, query, color = 'primary', sx, ...other }: Props) {
   const theme = useTheme();
   const chartColors = [theme.palette[color].dark];
   const [isAuthenticated, token] = useAuth();
@@ -44,8 +46,55 @@ export function AnalyticsLineChart({ title, color = 'primary', sx, ...other }: P
   });
 
   useEffect(() => {
-    // if (!(chart.categories.length > 0)) {
-    // }
+    if (!(chart.categories.length > 0)) {
+      const date = new Date();
+      const month = date.getMonth();
+      date.setMonth(date.getMonth() - 3);
+      fetch(`${import.meta.env.VITE_HASURA_URL}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          query: `query MyQuery($website_id: uuid = "", $event_id: String = "", $created_at: timestamptz = "") {
+            get_events(args: {created_at: $created_at, event_id: $event_id, website_id: $website_id}) {
+              event_count
+              month
+            }
+          }`,
+          variables: {
+            website_id: `${import.meta.env.VITE_WEBSITE_ID}`,
+            event_id: 'send_message',
+            created_at: date.toISOString(),
+          },
+        }),
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.errors) {
+            //  TODO Error Handling
+          } else if (res.data.get_events.length > 0) {
+            const categories = ['', '', '', ''];
+            const series = [0, 0, 0, 0];
+            let index = 0;
+            let total = 0;
+            while (index <= 3) {
+              if (Object.prototype.hasOwnProperty.call(res.data.get_events, index)) {
+                categories[index] = res.data.get_events[index].month;
+                series[index] = res.data.get_events[index].event_count;
+                total += res.data.get_events[index].event_count;
+              }
+              index += 1;
+            }
+            setChart({
+              series,
+              categories,
+              total,
+              percent: series[1] === 0 ? 100 : (series[0] / series[1]) * 100,
+            });
+          }
+        });
+    }
   }, [token, chart]);
 
   const chartOptions = useChart({

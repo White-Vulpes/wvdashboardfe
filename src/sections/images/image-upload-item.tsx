@@ -31,7 +31,7 @@ const StyledSnackbarContent = styled(SnackbarContent)(({ theme }) => ({
 const ImageUploadItem = forwardRef<HTMLDivElement, Props>((props, ref) => {
   const { selectedItems, message, id, category } = props;
   const [imageData, setImageData] = useState<any[]>(
-    _.fill(Array(selectedItems.length), { name: '', type: '', content: '' })
+    _.fill(Array(selectedItems.length), { name: '', type: '', content: '', loading: true })
   );
   const theme = useTheme();
   const [progressData, setProgressData] = useState<number[]>(
@@ -41,6 +41,44 @@ const ImageUploadItem = forwardRef<HTMLDivElement, Props>((props, ref) => {
   const [expanded, setExpanded] = useState(true);
   const isMounted = useRef(false);
 
+  const uploadData = useCallback(
+    (index: number) => {
+      if (imageData[index] !== undefined) {
+        const ws = new WebSocket(`${import.meta.env.VITE_API_URL}/upload`);
+        ws.onopen = (e) => {
+          ws.send(
+            JSON.stringify({
+              bucketName: 'polaroidfiles',
+              key: `${category}/${imageData[index].name}`,
+              type: imageData[index].type,
+              content: imageData[index].content,
+              website_id: `${import.meta.env.VITE_WEBSITE_ID}`,
+            })
+          );
+        };
+        ws.onmessage = (e) => {
+          const data = JSON.parse(e.data);
+          if (data.message === 'Upload Successful') {
+            setProgressData((prev) => {
+              const updatedProgress = [...prev];
+              updatedProgress[index] = 1;
+              return updatedProgress;
+            });
+            ws.close();
+            uploadData(index + 1);
+            return;
+          }
+          setProgressData((prev) => {
+            const updatedProgress = [...prev];
+            updatedProgress[index] = data.error !== undefined ? -1 : data.loaded / data.total;
+            return updatedProgress;
+          });
+        };
+      }
+    },
+    [category, imageData]
+  );
+
   useEffect(() => {
     if (!isMounted.current) {
       _.forEach(selectedItems, (file, index) => {
@@ -48,38 +86,24 @@ const ImageUploadItem = forwardRef<HTMLDivElement, Props>((props, ref) => {
         reader.onload = (ev: any) => {
           setImageData((prev) => {
             const updatedImages = [...prev];
-            updatedImages[index] = { name: file.name, type: file.type, content: ev.target.result };
+            updatedImages[index] = {
+              name: file.name,
+              type: file.type,
+              content: ev.target.result,
+              loading: false,
+            };
             return updatedImages;
           });
-          const ws = new WebSocket(`${import.meta.env.VITE_API_URL}/upload`);
-          ws.onopen = (e) => {
-            ws.send(
-              JSON.stringify({
-                bucketName: 'polaroidfiles',
-                key: `${category}/${file.name}`,
-                type: file.type,
-                content: ev.target.result,
-                website_id: `${import.meta.env.VITE_WEBSITE_ID}`,
-              })
-            );
-          };
-          ws.onmessage = (e) => {
-            const data = JSON.parse(e.data);
-            if (data.message === 'Upload Successful') ws.close();
-            else {
-              setProgressData((prev) => {
-                const updatedProgress = [...prev];
-                updatedProgress[index] = data.error !== undefined ? -1 : data.loaded / data.total;
-                return updatedProgress;
-              });
-            }
-          };
         };
         reader.readAsDataURL(file);
       });
       isMounted.current = true;
     }
-  }, [selectedItems, category]);
+    if (_.every(imageData, (image) => image.content !== '')) {
+      console.log(imageData);
+      uploadData(0);
+    }
+  }, [selectedItems, category, uploadData, imageData]);
 
   const handleExpandClick = useCallback(() => {
     setExpanded((oldExpanded) => !oldExpanded);
@@ -158,6 +182,7 @@ const ImageUploadItem = forwardRef<HTMLDivElement, Props>((props, ref) => {
                         : theme.palette.success.light
                     }
                     progress={progressData[index]}
+                    loading={i.loading}
                   />
                 </Box>
               </Fade>
